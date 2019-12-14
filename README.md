@@ -1,1 +1,1 @@
-A Spring Boot API, it's scope is to get requests from the clients and communicate with the other GMART APIs 
+A Spring Boot API, it's main scope is to decide and process requests from the client side to the other GMART APIs 
