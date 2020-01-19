@@ -2,13 +2,16 @@ package com.gmart.api.controllers;
 
 import javax.validation.Valid;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
@@ -20,13 +23,25 @@ import com.gmart.api.messages.core.responses.enums.LoginStatus;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("api")
+@RequestMapping("gmartws-api")
+@CrossOrigin(origins = "http://localhost:4200", maxAge = 5000)
 @Slf4j
 public class GMARTCoreController {
 
-	@PostMapping("/gmartws/api/authenticate")
-	public ResponseEntity<?> send(@RequestBody @Valid SignInRequest signInRequest) {
-		log.info("Starting REST Client!!!!");
+	@Value("${gmart.ws.core.url}")
+	private String url;
+
+	@Value("${gmart.ws.core.uri.signin}")
+	private String uriSignin;
+
+	@Value("${gmart.ws.core.uri.signup}")
+	private String uriSignup;
+
+
+	@PostMapping("/authenticate")
+	@ResponseBody
+	public ResponseEntity<?> sigin(@RequestBody @Valid SignInRequest signInRequest) {
+		log.info("Starting REST Client : " + url);
 
 		try {
 			log.info(signInRequest.toString());
@@ -35,7 +50,8 @@ public class GMARTCoreController {
 			rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 			rt.getMessageConverters().add(new StringHttpMessageConverter());
 
-			SignInResponse signInResponse = rt.postForObject(signInRequest.getUri(), signInRequest.getSignIn(),
+			SignInResponse signInResponse = rt.postForObject(url + uriSignin,
+					signInRequest,
 					SignInResponse.class);
 			if (signInResponse != null && signInResponse.getError() == null) {
 				log.info("User has been found ");
@@ -49,7 +65,6 @@ public class GMARTCoreController {
 						+ ", Message " + signInResponse.getError().getMessage());
 
 			}
-
 
 		} catch (Exception e) {
 
@@ -67,5 +82,6 @@ public class GMARTCoreController {
 
 		}
 	}
+
 
 }
