@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("messenger")
-@CrossOrigin(origins = "http://localhost:4200", maxAge = 5000)
+@CrossOrigin(origins = { "http://localhost:4200", "https://gmart-front.herokuapp.com" }, maxAge = 5000)
 @Slf4j
 public class MessengerController {
 
