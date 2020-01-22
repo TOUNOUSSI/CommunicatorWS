@@ -8,6 +8,5 @@ import lombok.Data;
 @Data
 public class SignUpResponse {
 	SignUpStatus signUpStatus;
-	UserInfo registredUser;
 	CustomError error;
 }
