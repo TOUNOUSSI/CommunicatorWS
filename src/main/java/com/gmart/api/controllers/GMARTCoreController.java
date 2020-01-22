@@ -86,6 +86,8 @@ public class GMARTCoreController {
 		}
 	}
 
+	@PostMapping("/register")
+	@ResponseBody
 	public ResponseEntity<?> signup(@RequestBody @Valid SignUpRequest signUpRequest) {
 		log.info("Starting REST Client : " + url);
 
