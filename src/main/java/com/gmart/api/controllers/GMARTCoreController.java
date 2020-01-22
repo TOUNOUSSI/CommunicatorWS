@@ -16,9 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.gmart.api.messages.core.requests.SignInRequest;
+import com.gmart.api.messages.core.requests.SignUpRequest;
 import com.gmart.api.messages.core.responses.entities.CustomError;
 import com.gmart.api.messages.core.responses.entities.SignInResponse;
+import com.gmart.api.messages.core.responses.entities.SignUpResponse;
 import com.gmart.api.messages.core.responses.enums.LoginStatus;
+import com.gmart.api.messages.core.responses.enums.SignUpStatus;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -83,5 +86,43 @@ public class GMARTCoreController {
 		}
 	}
 
+	public ResponseEntity<?> signup(@RequestBody @Valid SignUpRequest signUpRequest) {
+		log.info("Starting REST Client : " + url);
+
+		try {
+			log.info(signUpRequest.toString());
+
+			RestTemplate rt = new RestTemplate();
+			rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+			rt.getMessageConverters().add(new StringHttpMessageConverter());
+
+			SignUpResponse signUpResponse = rt.postForObject(url + uriSignup, signUpRequest, SignUpResponse.class);
+			if (signUpResponse != null && signUpResponse.getError() == null) {
+				log.info("User has been created ");
+				return ResponseEntity.status(HttpStatus.ACCEPTED).body(signUpResponse);
+			} else {
+				log.error("Communicator Exception | code : " + signUpResponse.getError().getCode() + ", Message "
+						+ signUpResponse.getError().getMessage());
+				throw new Exception("Communicator Exception | code : " + signUpResponse.getError().getCode()
+						+ ", Message " + signUpResponse.getError().getMessage());
+
+			}
+
+		} catch (Exception e) {
+
+			SignUpResponse signUpResponse = new SignUpResponse();
+			CustomError error = new CustomError();
+			signUpResponse.setSignUpStatus(SignUpStatus.NOT_CREATED);
+
+			error.setCode("500");
+
+			error.setMessage(e.getMessage());
+
+			signUpResponse.setError(error);
+
+			return ResponseEntity.status(Integer.parseInt(error.getCode())).body(signUpResponse);
+
+		}
+	}
 
 }
