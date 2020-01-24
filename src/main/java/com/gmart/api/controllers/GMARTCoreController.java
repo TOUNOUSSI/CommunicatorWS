@@ -105,8 +105,7 @@ public class GMARTCoreController {
 			} else {
 				log.error("Communicator Exception | code : " + signUpResponse.getError().getCode() + ", Message "
 						+ signUpResponse.getError().getMessage());
-				throw new Exception("Communicator Exception | code : " + signUpResponse.getError().getCode()
-						+ ", Message " + signUpResponse.getError().getMessage());
+				throw new Exception(signUpResponse.getError().getMessage());
 
 			}
 
