@@ -1,4 +1,4 @@
-package com.gmart.api.controllers;
+package com.gmart.api.controllers.core;
 
 import javax.validation.Valid;
 
@@ -26,10 +26,10 @@ import com.gmart.api.messages.core.responses.enums.SignUpStatus;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("gmartws-api")
+@RequestMapping("gmartws-core-auth")
 @CrossOrigin(origins = { "http://localhost:4200", "https://gmart-front.herokuapp.com" }, maxAge = 5000)
 @Slf4j
-public class GMARTCoreController {
+public class CoreAuthController {
 
 	@Value("${gmart.ws.core.url}")
 	private String url;

@@ -1,4 +1,4 @@
-package com.gmart.api.controllers;
+package com.gmart.api.controllers.chat;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;

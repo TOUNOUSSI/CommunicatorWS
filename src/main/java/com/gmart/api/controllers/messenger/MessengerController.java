@@ -1,4 +1,4 @@
-package com.gmart.api.controllers;
+package com.gmart.api.controllers.messenger;
 
 import java.util.Collections;
 import java.util.List;
