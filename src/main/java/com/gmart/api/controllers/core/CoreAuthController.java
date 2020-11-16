@@ -3,10 +3,10 @@ package com.gmart.api.controllers.core;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,13 +15,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import com.gmart.api.messages.core.requests.SignInRequest;
-import com.gmart.api.messages.core.requests.SignUpRequest;
-import com.gmart.api.messages.core.responses.entities.CustomError;
-import com.gmart.api.messages.core.responses.entities.SignInResponse;
-import com.gmart.api.messages.core.responses.entities.SignUpResponse;
-import com.gmart.api.messages.core.responses.enums.LoginStatus;
-import com.gmart.api.messages.core.responses.enums.SignUpStatus;
+
+import com.gmart.common.enums.core.LoginStatus;
+import com.gmart.common.enums.core.SignUpStatus;
+import com.gmart.common.messages.core.requests.SignInRequest;
+import com.gmart.common.messages.core.requests.SignUpRequest;
+import com.gmart.common.messages.core.responses.CustomError;
+import com.gmart.common.messages.core.responses.SignInResponse;
+import com.gmart.common.messages.core.responses.SignUpResponse;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -35,10 +36,10 @@ public class CoreAuthController {
 	private String url;
 
 	@Value("${gmart.ws.core.uri.signin}")
-	private String uriSignin;
+	private String siginInURI;
 
 	@Value("${gmart.ws.core.uri.signup}")
-	private String uriSignup;
+	private String signupURI;
 
 
 	@PostMapping("/authenticate")
@@ -50,17 +51,13 @@ public class CoreAuthController {
 			log.info(signInRequest.toString());
 
 			RestTemplate rt = new RestTemplate();
-			rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-			rt.getMessageConverters().add(new StringHttpMessageConverter());
-
-			SignInResponse signInResponse = rt.postForObject(url + uriSignin,
-					signInRequest,
-					SignInResponse.class);
+			HttpEntity<SignInRequest> entity = new HttpEntity<SignInRequest>(signInRequest)	;
+			SignInResponse signInResponse = rt.exchange(url + siginInURI, HttpMethod.POST, entity, SignInResponse.class).getBody();
 			if (signInResponse != null && signInResponse.getError() == null) {
 				log.info("User has been found ");
 				log.info(signInResponse.getAuthenticatedUser().toString());
 				log.info("End REST Client!!!!");
-				return ResponseEntity.status(HttpStatus.ACCEPTED).body(signInResponse);
+				return ResponseEntity.status(HttpStatus.OK).body(signInResponse);
 			} else {
 				log.error("Communicator Exception | code : " + signInResponse.getError().getCode() + ", Message "
 						+ signInResponse.getError().getMessage());
@@ -95,13 +92,12 @@ public class CoreAuthController {
 			log.info(signUpRequest.toString());
 
 			RestTemplate rt = new RestTemplate();
-			rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-			rt.getMessageConverters().add(new StringHttpMessageConverter());
+			HttpEntity<SignUpRequest> entity = new HttpEntity<>(signUpRequest)	;
+			SignUpResponse signUpResponse = rt.exchange(url + signupURI, HttpMethod.POST, entity, SignUpResponse.class).getBody();
 
-			SignUpResponse signUpResponse = rt.postForObject(url + uriSignup, signUpRequest, SignUpResponse.class);
 			if (signUpResponse != null && signUpResponse.getError() == null) {
 				log.info("User has been created ");
-				return ResponseEntity.status(HttpStatus.ACCEPTED).body(signUpResponse);
+				return ResponseEntity.status(HttpStatus.OK).body(signUpResponse);
 			} else {
 				log.error("Communicator Exception | code : " + signUpResponse.getError().getCode() + ", Message "
 						+ signUpResponse.getError().getMessage());
