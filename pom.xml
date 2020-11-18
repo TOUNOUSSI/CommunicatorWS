@@ -1,22 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	 <parent>
-        <groupId>com.gmart.api</groupId>
-        <artifactId>gmart-api</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.2.1.RELEASE</version>
+		<relativePath></relativePath>
+	</parent>
+
 	<artifactId>gmart-communicator</artifactId>
 	<name>gmart-communicator</name>
 	<description>GMART Communicator for Spring Boot</description>
+	<version>0.0.1-SNAPSHOT</version>
+
+	<!-- Add GMART-Common library -->
+	<repositories>
+		<repository>
+			<id>lib</id>
+			<url>file://${project.basedir}/lib</url>
+		</repository>
+	</repositories>
+
+	<developers>
+		<developer>
+			<name>YOUSSEF TOUNOUSSI</name>
+			<url>https://github.com/TOUNOUSSI</url>
+		</developer>
+	</developers>
 
 	<dependencies>
-		
 		<dependency>
-			<groupId>com.gmart.api</groupId>
+			<groupId>com.gmart.common</groupId>
 			<artifactId>gmart-common</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>${version}</version>
 		</dependency>
 
 		<dependency>
@@ -57,4 +75,9 @@
 		</plugins>
 	</build>
 
+
+	<scm>
+		<url>https://github.com/TOUNOUSSI/gmart-core</url>
+		<connection>https://github.com/TOUNOUSSI/gmart-core.git</connection>
+	</scm>
 </project>
