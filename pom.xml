@@ -18,8 +18,8 @@
 	<!-- Add GMART-Common library -->
 	<repositories>
 		<repository>
-			<id>lib</id>
-			<url>file://${project.basedir}/lib</url>
+			<id>local-repository</id>
+			<url>file://${project.basedir}/repository</url>
 		</repository>
 	</repositories>
 
