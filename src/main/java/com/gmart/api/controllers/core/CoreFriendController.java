@@ -59,7 +59,7 @@ public class CoreFriendController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			friendHasBeenAdded = rt.exchange(url + addNewFriendURI + pseudoname, HttpMethod.PUT, entity, Boolean.class)
@@ -81,7 +81,7 @@ public class CoreFriendController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			List<UserInfoDTO> friends = rt.exchange(url + myFriendsURI, HttpMethod.GET, entity,
@@ -109,10 +109,10 @@ public class CoreFriendController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
-			List<UserInfoDTO> matches = rt.exchange(url + findFriendsURI, HttpMethod.GET, entity,
+			List<UserInfoDTO> matches = rt.exchange(url + findFriendsURI+criteria, HttpMethod.GET, entity,
 					new ParameterizedTypeReference<List<UserInfoDTO>>() {
 					}).getBody();
 			if (!CollectionUtils.isEmpty(matches)) {
@@ -137,7 +137,7 @@ public class CoreFriendController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			alreadyFriends = rt
@@ -162,7 +162,7 @@ public class CoreFriendController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			UserInfoDTO friendMatch = rt.exchange(url + findFriendURI, HttpMethod.GET, entity,
