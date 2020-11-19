@@ -1,20 +1,22 @@
 package com.gmart.api.controllers.core;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
-
 
 import com.gmart.common.enums.core.LoginStatus;
 import com.gmart.common.enums.core.SignUpStatus;
@@ -40,7 +42,9 @@ public class CoreAuthController {
 
 	@Value("${gmart.ws.core.uri.signup}")
 	private String signupURI;
-
+	
+	@Value("${gmart.ws.core.uri.signout}")
+	private String signoutURI;
 
 	@PostMapping("/authenticate")
 	@ResponseBody
@@ -121,5 +125,26 @@ public class CoreAuthController {
 
 		}
 	}
+	
+	
+	@GetMapping("/logout")
+	public ResponseEntity<Boolean> signout(HttpServletRequest request) {
+		RestTemplate rt = null;
+		log.info("Starting getFriendList");
+		try {
+			rt = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("token", request.getHeader("token"));
+			// example of custom header
+			HttpEntity<?> entity = new HttpEntity<Object>(headers);
+		
+				return ResponseEntity.status(HttpStatus.OK).body(rt.exchange(url + signoutURI, HttpMethod.GET, entity,
+						Boolean.class).getBody());
+			
+		} catch (Exception e) {
+			log.error(e.getMessage());
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
+		}
 
+	}
 }
