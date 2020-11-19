@@ -1,10 +1,14 @@
 package com.gmart.api.controllers.core;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -27,18 +31,19 @@ public class CoreAccountController {
 	@Value("${gmart.ws.core.url}")
 	private String url;
 
-
 	@GetMapping("/all")
 	@ResponseBody
-	public ResponseEntity<?> getAccounts() {
-
+	public ResponseEntity<?> getAccounts(HttpServletRequest request) {
+		RestTemplate rt = null;
+		log.info("Starting getAccounts");
 		try {
-
-			RestTemplate rt = new RestTemplate();
-			rt.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-			rt.getMessageConverters().add(new StringHttpMessageConverter());
-			
-			return ResponseEntity.status(HttpStatus.ACCEPTED).body(rt.getForObject(url, List.class));
+			rt = new RestTemplate();
+			HttpHeaders headers = new HttpHeaders();
+			headers.set("token", request.getHeader("token"));
+			// example of custom header
+			HttpEntity<?> entity = new HttpEntity<Object>(headers);
+			return ResponseEntity.status(HttpStatus.ACCEPTED)
+					.body(rt.exchange(url, HttpMethod.GET, entity, List.class));
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new ArrayList<>());
 
