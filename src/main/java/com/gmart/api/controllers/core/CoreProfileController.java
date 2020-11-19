@@ -7,13 +7,20 @@
  */
 package com.gmart.api.controllers.core;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -29,6 +36,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.gmart.api.services.FileService;
 import com.gmart.common.messages.core.ProfileDTO;
 
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +57,7 @@ public class CoreProfileController {
 
 	@Value("${gmart.ws.core.uri.profile.find-profile}")
 	private String findProfileURI;
-	
+
 	@Value("${gmart.ws.core.uri.profile.find-my-profile}")
 	private String getMyProfileURI;
 
@@ -59,30 +67,33 @@ public class CoreProfileController {
 	@Value("${gmart.ws.core.uri.profile.update-profile-picture}")
 	private String updateMyProfilePictureURI;
 
+	@Autowired
+	FileService fileService;
+	
 	@GetMapping("/find-profile/{pseudoname}")
 	@ResponseBody
-	public ResponseEntity<ProfileDTO> findProfile(@PathVariable("pseudoname") String pseudoname, HttpServletRequest request) {
+	public ResponseEntity<ProfileDTO> findProfile(@PathVariable("pseudoname") String pseudoname,
+			HttpServletRequest request) {
 		ProfileDTO profile = new ProfileDTO();
 		RestTemplate rt = null;
 		log.info("Find Profile End-point :: Started");
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
-			profile = rt.exchange(url + findProfileURI+pseudoname, HttpMethod.GET, entity, ProfileDTO.class).getBody();
-			
+			profile = rt.exchange(url + findProfileURI + pseudoname, HttpMethod.GET, entity, ProfileDTO.class)
+					.getBody();
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(profile);
 		}
-		
+
 		return ResponseEntity.status(HttpStatus.OK).body(profile);
 	}
-	
-	
+
 	@GetMapping("/find-my-profile")
 	@ResponseBody
 	public ResponseEntity<ProfileDTO> getMyProfile(HttpServletRequest request) {
@@ -92,17 +103,16 @@ public class CoreProfileController {
 		try {
 			rt = new RestTemplate();
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
 			// example of custom header
 			HttpEntity<?> entity = new HttpEntity<Object>(headers);
 			myProfile = rt.exchange(url + getMyProfileURI, HttpMethod.GET, entity, ProfileDTO.class).getBody();
-			
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(myProfile);
 		}
-		
+
 		return ResponseEntity.status(HttpStatus.OK).body(myProfile);
 	}
 
@@ -115,9 +125,10 @@ public class CoreProfileController {
 		try {
 			rt = new RestTemplate();
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-			body.add("file", file);
+			body.add("file", new FileSystemResource(fileService.convertMultiPartFileToIOFile(file)));
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.set("Token", request.getHeader("token"));
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 			// setting both body and headers into HttpEntity
 			HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
 
@@ -129,8 +140,7 @@ public class CoreProfileController {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
 	}
-	
-	
+
 	@PostMapping("/update-profile-picture")
 	@ResponseBody
 	public ResponseEntity<?> updateProfilePicture(@RequestParam("file") MultipartFile file,
@@ -140,18 +150,22 @@ public class CoreProfileController {
 		try {
 			rt = new RestTemplate();
 			MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-			body.add("file", file);
+			body.add("file", new FileSystemResource(fileService.convertMultiPartFileToIOFile(file)));
 			HttpHeaders headers = new HttpHeaders();
-			headers.set("token", request.getHeader("token"));
+			headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+			headers.set("Token", request.getHeader("token"));
 			// setting both body and headers into HttpEntity
 			HttpEntity<MultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
 
-			return ResponseEntity.status(HttpStatus.OK)
-					.body(rt.exchange(url + updateMyProfilePictureURI, HttpMethod.POST, entity, Object.class).getBody());
+			return ResponseEntity.status(HttpStatus.OK).body(
+					rt.exchange(url + updateMyProfilePictureURI, HttpMethod.POST, entity, Object.class).getBody());
 
 		} catch (Exception e) {
 			log.error(e.getMessage());
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(false);
 		}
 	}
+	
+	
 }
